@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Editar Producto</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+  <div class="container py-5">
+    <h2>Editar Producto</h2>
+    <form id="form-editar">
+      <input type="hidden" id="id">
+      <div class="mb-3">
+        <label for="nombre" class="form-label">Nombre</label>
+        <input type="text" class="form-control" id="nombre" required>
+      </div>
+      <div class="mb-3">
+        <label for="precio" class="form-label">Precio</label>
+        <input type="number" step="0.01" class="form-control" id="precio" required>
+      </div>
+      <div class="mb-3">
+        <label for="stock" class="form-label">Stock</label>
+        <input type="number" class="form-control" id="stock" required>
+      </div>
+      <button type="submit" class="btn btn-success">Guardar Cambios</button>
+      <a href="index.html" class="btn btn-secondary">Volver</a>
+    </form>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    const url = `http://localhost/apiproductos/productos/read_one.php?id=${id}`;
+
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('id').value = data.id;
+        document.getElementById('nombre').value = data.nombre;
+        document.getElementById('precio').value = data.precio;
+        document.getElementById('stock').value = data.stock;
+      });
+
+    document.getElementById('form-editar').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      fetch(`http://localhost/apiproductos/productos/update.php`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: document.getElementById('id').value,
+          nombre: document.getElementById('nombre').value,
+          precio: document.getElementById('precio').value,
+          stock: document.getElementById('stock').value
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.mensaje || data.error);
+        if (data.mensaje) {
+          window.location.href = 'index.html';
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
